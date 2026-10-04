@@ -232,8 +232,8 @@ enum JITShortcutFile {
         get { UserDefaults.standard.string(forKey: Self.pendingKey) }
         set { UserDefaults.standard.set(newValue, forKey: Self.pendingKey) }
     }
-    private var waiting: ((Outcome) -> Void)?
-    private var timeout: Timer?
+    private @Published var waiting: ((Outcome) -> Void)?
+    private @Published var timeout: Timer?
 
     /// Runs "start". Pending from before it runs: even a "start" that fails part-way may
     /// have changed something.

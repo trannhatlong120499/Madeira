@@ -128,9 +128,9 @@ final class SteamSignInModel: ObservableObject {
 
     private let credentials = SteamCredentialAuth()
     private let qr = SteamQRAuth()
-    private var signInTask: Task<Void, Never>?
+    private @Published var signInTask: Task<Void, Never>?
 
-    var signedIn: Bool { accountName != nil }
+    @Published var signedIn: Bool { accountName != nil }
 
     init() { refresh() }
 

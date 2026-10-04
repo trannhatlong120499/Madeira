@@ -356,11 +356,11 @@ enum SteamDirectStart {
     @Published private(set) var games: [DockGame] = []
     /// `buildid` of each install in Madeira's own library folder, by App ID.
     @Published private(set) var builds: [Int: Int] = [:]
-    private var scanning = false
+    private @Published var scanning = false
     /// A refresh was asked for while a scan ran (an install record was just
     /// written): scan again once it ends.
-    private var rescan = false
-    private var lastCount = -1
+    private @Published var rescan = false
+    private @Published var lastCount = -1
 
     /// Reads the install records again, off the main thread.
     func refresh() {

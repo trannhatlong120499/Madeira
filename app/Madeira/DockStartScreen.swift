@@ -266,12 +266,12 @@ final class DockStartScreen: ObservableObject {
     /// A window that may need the user is up behind the starting screen.
     @Published private(set) var attention = false
 
-    private var hold: SteamLaunchHold?
-    private var sceneLines = 0
-    private var early = Set<UInt64>()
-    private var hostStarted = false
-    private var exitObserved = false
-    private var started = Date()
+    private @Published var hold: SteamLaunchHold?
+    private @Published var sceneLines = 0
+    private @Published var early = Set<UInt64>()
+    private @Published var hostStarted = false
+    private @Published var exitObserved = false
+    private @Published var started = Date()
     private let places = SteamLaunchScene.Places.standard
 
     /// A library session begins; `game` is set for a Dock start.

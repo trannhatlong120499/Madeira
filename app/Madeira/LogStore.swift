@@ -15,16 +15,16 @@ final class LogStore: ObservableObject {
     }()
 
     // Tail-file reader (background)
-    private var tail: LogTail?
+    private @Published var tail: LogTail?
     // Signature → index into `entries` so we can update in O(1)
-    private var sigToIndex: [String: Int] = [:]
+    private @Published var sigToIndex: [String: Int] = [:]
     // Lock for sigToIndex + pending mutations
     private let stateLock = NSLock()
     // Pending batched diffs to apply on main thread
-    private var pendingNew: [LogEntry] = []
-    private var pendingUpdates: [(index: Int, count: Int, lastRaw: String, lastTimestamp: Date)] = []
-    private var flushTimer: Timer?
-    private var displaySuppressed = false
+    private @Published var pendingNew: [LogEntry] = []
+    private @Published var pendingUpdates: [(index: Int, count: Int, lastRaw: String, lastTimestamp: Date)] = []
+    private @Published var flushTimer: Timer?
+    private @Published var displaySuppressed = false
 
     func setDisplayActive(_ active: Bool) {
         let disabled = !MadeiraConfig.flag("MADEIRA_UI_LOG_IDLE")

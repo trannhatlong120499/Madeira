@@ -316,8 +316,8 @@ final class ControlPresetsModel: ObservableObject {
     @Published private(set) var store = ControlPresetStore()
     /// A file that exists and cannot be read is left untouched: saving is
     /// refused instead of overwriting it.
-    private(set) var readOnly = false
-    private var logged = 0
+    private(set) @Published var readOnly = false
+    private @Published var logged = 0
 
     private static var url: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]

@@ -10,43 +10,42 @@
 import Foundation
 
 /// Manages the authenticated Steam session: login, heartbeat, reconnection, message routing.
-@Observable
 @MainActor
-class SteamSession {
+class SteamSession: ObservableObject {
     // MARK: - Published State
 
-    private(set) var connectionState: SteamConnectionState = .disconnected
-    private(set) var steamID: UInt64 = 0
-    private(set) var accountName: String = ""
-    private(set) var personaName: String = ""
-    private(set) var cellID: UInt32 = 0
+    private(set) @Published var connectionState: SteamConnectionState = .disconnected
+    private(set) @Published var steamID: UInt64 = 0
+    private(set) @Published var accountName: String = ""
+    private(set) @Published var personaName: String = ""
+    private(set) @Published var cellID: UInt32 = 0
     /// While true the session neither connects nor reconnects: a game session
     /// runs, and Valve's own client must be the only one logged on with this
     /// account (see `suspend()`).
-    private(set) var isSuspended = false
+    private(set) @Published var isSuspended = false
 
     // MARK: - Internal State
 
     private let connection = SteamConnection()
     let serverList = CMServerList()
-    private var sessionID: Int32 = 0
-    private var heartbeatInterval: Int32 = 30  // seconds
-    private var heartbeatTask: Task<Void, Never>?
-    private var reconnectTask: Task<Void, Never>?
-    private var reconnectAttempts = 0
+    private @Published var sessionID: Int32 = 0
+    private @Published var heartbeatInterval: Int32 = 30  // seconds
+    private @Published var heartbeatTask: Task<Void, Never>?
+    private @Published var reconnectTask: Task<Void, Never>?
+    private @Published var reconnectAttempts = 0
     private let maxReconnectAttempts = 5
-    private var idleDisconnectTask: Task<Void, Never>?
+    private @Published var idleDisconnectTask: Task<Void, Never>?
     /// How long to stay connected after the last activity before auto-disconnecting (seconds)
     private let idleTimeout: TimeInterval = 60
-    private var jobIDCounter: UInt64 = 0
-    private var pendingJobs: [UInt64: CheckedContinuation<SteamMessageCodec.IncomingMessage, Error>] = [:]
-    private var messageHandlers: [UInt32: (SteamMessageCodec.IncomingMessage) -> Void] = [:]
+    private @Published var jobIDCounter: UInt64 = 0
+    private @Published var pendingJobs: [UInt64: CheckedContinuation<SteamMessageCodec.IncomingMessage, Error>] = [:]
+    private @Published var messageHandlers: [UInt32: (SteamMessageCodec.IncomingMessage) -> Void] = [:]
 
     private struct PICSAccumulator {
         var messages: [SteamMessageCodec.IncomingMessage]
         var continuation: CheckedContinuation<[SteamMessageCodec.IncomingMessage], Error>
     }
-    private var pendingPICSJobs: [UInt64: PICSAccumulator] = [:]
+    private @Published var pendingPICSJobs: [UInt64: PICSAccumulator] = [:]
     private let licenseListBox = LicenseListBox()
 
     /// SteamID used for pre-logon messages.
