@@ -1128,7 +1128,7 @@ final class InputSettings: ObservableObject {
     /// didSet fires for assignments made in init() because the properties are
     /// already initialised by then; without this the first launch would write
     /// the defaults back over a file it had only half-read.
-    private @Published var loading = false
+    @Published private var loading = false
 
     private static var url: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -3588,7 +3588,7 @@ final class TouchControlsModel: ObservableObject {
     /// ml1970: no controls file existed at launch, so the built-in controller
     /// layout may be applied once (ControlPresetsModel.applyDefaultIfNeeded).
     @Published var needsDefaultLayout = false
-    private @Published var editBaseline: [TouchControl] = []
+    @Published private var editBaseline: [TouchControl] = []
 
     /// One size for the whole layout (0.5...2), multiplying each control's own
     /// pinch `scale`. A library entry keeps its own (Control size) and sets it
@@ -3604,7 +3604,7 @@ final class TouchControlsModel: ObservableObject {
     /// shape otherwise (ControlAction.controlSize).
     static func size(_ c: TouchControl) -> CGSize { c.action.controlSize(diameter: diameter(c)) }
 
-    private @Published var loading = false
+    @Published private var loading = false
     private static var url: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("madeira-controls.json")

@@ -81,10 +81,10 @@ final class LibraryController: ObservableObject, @unchecked Sendable {
     @Published var connected = false
     let commands = PassthroughSubject<String, Never>()
     private let lock = NSLock()
-    private @Published var enabled = false
-    private @Published var owns = false
-    private @Published var last: UInt16 = 0
-    private @Published var announced = false
+    @Published private var enabled = false
+    @Published private var owns = false
+    @Published private var last: UInt16 = 0
+    @Published private var announced = false
     private let allowed = MadeiraConfig.flag("MADEIRA_FRONTEND_CONTROLLER")
     var ownsInput: Bool { lock.lock(); defer { lock.unlock() }; return enabled && owns }
     func configure(enabled: Bool, ownsInput: Bool) {
@@ -420,24 +420,24 @@ final class LibraryModel: ObservableObject {
     @Published var sessionMessage = ""
     @Published var launching = false
     @Published var overlayFields = ["FPS", "Frame time", "RAM", "Battery"]
-    private @Published var launchPresent: UInt64 = 0
-    private @Published var launchSurface: UInt64 = 0
-    private @Published var launchStarted = Date()
+    @Published private var launchPresent: UInt64 = 0
+    @Published private var launchSurface: UInt64 = 0
+    @Published private var launchStarted = Date()
     /// Read by the starting screen for its elapsed-time line.
     var launchStartedAt: Date { launchStarted }
     @Published var launchSlow = false
     @Published var launchLogs = false
-    private @Published var launchDismissLogged = false
+    @Published private var launchDismissLogged = false
     @Published var menuButtonRect = CGRect.zero
     @Published var performanceRect = CGRect.zero
     /// The in-game menu and the starting screen take every touch.
     @Published var blocksGameplayTouch: Bool { current != nil && (menu || launching) }
-    private @Published var timer: Timer?
-    private @Published var sawProcess = false
+    @Published private var timer: Timer?
+    @Published private var sawProcess = false
     // Why a session ended by itself (not Quit): the program the app launched
     // exited with a Windows error (wine_crash_exit_status, WineProcessBridge.m).
     // MADEIRA_EXIT_REPORT=0 returns to the library without a message.
-    private @Published var quitRequested = false
+    @Published private var quitRequested = false
     private func exitReport() -> String? {
         guard !quitRequested, MadeiraConfig.flag("MADEIRA_EXIT_REPORT") else { return nil }
         var status: UInt32 = 0
@@ -446,15 +446,15 @@ final class LibraryModel: ObservableObject {
         let kind = status == 0xC0000005 ? " (memory access violation)" : status == 0xC0000017 ? " (out of memory)" : ""
         return "The game stopped with Windows error 0x\(String(status, radix: 16, uppercase: true))\(kind). Export the diagnostic log to report it."
     }
-    private @Published var readOnly = false
-    private @Published var metadataInFlight = Set<UUID>()
-    private @Published var steamMetadataInFlight = Set<Int>()
-    private @Published var savedControls: [TouchControl] = []
-    private @Published var savedLayout: String?
-    private @Published var savedVisible = true
-    private @Published var savedSize = 1.0
+    @Published private var readOnly = false
+    @Published private var metadataInFlight = Set<UUID>()
+    @Published private var steamMetadataInFlight = Set<Int>()
+    @Published private var savedControls: [TouchControl] = []
+    @Published private var savedLayout: String?
+    @Published private var savedVisible = true
+    @Published private var savedSize = 1.0
     /// The session's first frame makes the drawable's shape known (Aspect).
-    private @Published var laidOutAfterFirstPresent = false
+    @Published private var laidOutAfterFirstPresent = false
     private struct Document: Codable { var version: Int; var entries: [LibraryEntry] }
     private var file: URL { Self.documents.appendingPathComponent("madeira-library.json") }
 
@@ -852,7 +852,7 @@ final class LibraryModel: ObservableObject {
             GamepadInput.shared.setKeyboardMouse(nil)
         }
     }
-    private @Published var controlsSink: AnyCancellable?
+    @Published private var controlsSink: AnyCancellable?
 
     func setFPS(_ mode: Int) {
         fpsMode = mode
@@ -1077,7 +1077,7 @@ struct LibraryTitleText: View {
 final class LibraryJITState: ObservableObject {
     static let shared = LibraryJITState()
     @Published private(set) var enabled = StikJITHelper.ready
-    private @Published var timer: Timer?
+    @Published private var timer: Timer?
     private init() {
         let timer = Timer(timeInterval: 2, repeats: true) { [weak self] _ in self?.refresh() }
         RunLoop.main.add(timer, forMode: .common)   // keeps ticking while a list scrolls
@@ -1103,7 +1103,7 @@ final class LibraryHeaderAlignment: ObservableObject {
     @Published private(set) var shift: CGFloat = 0
     weak var field: UIView?
     weak var anchor: UIView?
-    private @Published var pending = false
+    @Published private var pending = false
 
     /// Called from layout passes; measures once they have finished, when the
     /// search field and the title are both at their final positions.

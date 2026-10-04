@@ -24,7 +24,7 @@ final class MadeiraDockModel: ObservableObject {
     /// App ID -> the game's One-time installs choice (true: Run at next start).
     @Published private(set) var installRunNext: [Int: Bool] = [:]
 
-    private @Published var watch: Task<Void, Never>?
+    @Published private var watch: Task<Void, Never>?
 
     func refresh() {
         clientInstalled = MadeiraDock.clientInstalled

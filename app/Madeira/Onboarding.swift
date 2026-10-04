@@ -89,7 +89,7 @@ enum OnboardingRules {
     @Published var presented = false
     @Published private(set) var step: Step = .welcome
     /// Considered once per app run, when the library first appears.
-    private @Published var considered = false
+    @Published private var considered = false
 
     static var enabled: Bool { OnboardingRules.enabled }
     /// 0 on a new install, and on one that finished setup before revisions (revision 1).
@@ -97,7 +97,7 @@ enum OnboardingRules {
 
     /// LocalDevVPN was missing when setup opened, so its page is offered. Fixed for that
     /// run of setup: installing it on the way does not renumber the steps.
-    private @Published var offerLocalDevVPN = false
+    @Published private var offerLocalDevVPN = false
     var steps: [Step] {
         OnboardingRules.steps(signIn: SteamSignIn.isEnabled, dock: MadeiraDock.enabled, localDevVPN: offerLocalDevVPN)
     }

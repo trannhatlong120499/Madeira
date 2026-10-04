@@ -200,13 +200,13 @@ final class SteamOwnedLibrary: ObservableObject {
         var progress = SteamDownloadProgress()
     }
     @Published private(set) var downloads: [Int: Download] = [:]
-    private @Published var queue: [Int] = []
-    private @Published var active: (id: Int, task: Task<Void, Never>)?
+    @Published private var queue: [Int] = []
+    @Published private var active: (id: Int, task: Task<Void, Never>)?
     /// A game session runs: downloads wait, and the Steam connection stays closed.
-    private @Published var inSession = false
-    private @Published var resumeAfterSession = Set<Int>()
+    @Published private var inSession = false
+    @Published private var resumeAfterSession = Set<Int>()
     /// Downloads paused because iOS ended Madeira's background time.
-    private @Published var resumeAfterBackgroundIDs = Set<Int>()
+    @Published private var resumeAfterBackgroundIDs = Set<Int>()
 
     private let session = SteamSession()
     /// The app's connection is closed while a game session (or Madeira Dock) holds the account.
@@ -214,14 +214,14 @@ final class SteamOwnedLibrary: ObservableObject {
                                                 reopen: { [session] in session.resume() })
     private lazy var fetcher = SteamLibraryFetcher(session: session)
     private lazy var downloader = DepotDownloader(session: session)
-    private @Published var started = false
+    @Published private var started = false
     /// Which account the cached list belongs to: a SHA-256 of the account name,
     /// so the cache file holds no name.
-    private @Published var cachedAccount: String?
+    @Published private var cachedAccount: String?
     private static func accountKey(_ name: String?) -> String? {
         name.map { SHA256.hash(data: Data($0.utf8)).map { String(format: "%02x", $0) }.joined() }
     }
-    private @Published var timer: Timer?
+    @Published private var timer: Timer?
 
     @Published var hasActiveDownload: Bool { downloads.values.contains { $0.state == .active || $0.state == .queued } }
     func game(_ appID: Int) -> SteamOwnedGame? { owned.first { $0.id == appID } }
@@ -399,7 +399,7 @@ final class SteamOwnedLibrary: ObservableObject {
 
     /// Steam Cloud state of the games checked in this app run, by App ID.
     @Published private(set) var cloud: [Int: SteamCloudState] = [:]
-    private @Published var cloudAudited = false
+    @Published private var cloudAudited = false
     /// Copies of the saves a sync replaced, where the Files app shows them
     /// (Madeira › Steam Cloud Backups): `<game> (<App ID>)/<time>/device/...` for a
     /// device file a download replaced, `.../cloud/...` for a cloud file an upload
@@ -423,7 +423,7 @@ final class SteamOwnedLibrary: ObservableObject {
     // over the other side unasked.
     private static var cloudBaselineURL: URL { supportFolder.appendingPathComponent("steam-cloud-sync.json") }
     private struct CloudBaseline: Codable { var account: String; var apps: [String: [String: String]] }
-    private @Published var cloudBaseline: [String: [String: String]]?
+    @Published private var cloudBaseline: [String: [String: String]]?
 
     private func baseline(_ appID: Int) -> [String: String] {
         if cloudBaseline == nil {
@@ -499,7 +499,7 @@ final class SteamOwnedLibrary: ObservableObject {
             try await session.callServiceMethod(method: .cloudGetAppFileChangelist, body: request.data, timeout: 20))
     }
 
-    private @Published var cloudBusy: Set<Int> = []
+    @Published private var cloudBusy: Set<Int> = []
 
     /// Compares the game's cloud saves with the prefix and returns what to do
     /// about the differences. Reads only (it records files found identical).
@@ -799,7 +799,7 @@ final class SteamOwnedLibrary: ObservableObject {
     }
     @Published private(set) var cloudQuit: CloudQuit?
     /// The app holds the account although a session runs (uploadForQuit).
-    private @Published var cloudTakeover = false
+    @Published private var cloudTakeover = false
     private var cloudBlocked: Bool { inSession && !cloudTakeover }
 
     /// Uploads the running game's changed saves. `replaceCloud` also sends the

@@ -566,51 +566,51 @@ final class HardwareInput: ObservableObject {
 
     // MARK: focus (main thread)
 
-    private @Published var appActive = true
+    @Published private var appActive = true
     /// The app is active, the game view is on screen and nothing is presented
     /// over it. Read by PadStickMouse.
-    private(set) @Published var baseFocused = true
-    private @Published var keyboardFocused = true
-    private @Published var mouseFocused = true
+    @Published private(set) var baseFocused = true
+    @Published private var keyboardFocused = true
+    @Published private var mouseFocused = true
     /// UIKit reports the pointer's position (hover): on iPad from the start,
     /// so the mouse belongs to the program only once the pointer is over the
     /// game view; on iPhone (AssistiveTouch) only if a hover ever arrives.
     /// Without it the mouse is routed by click focus.
-    private @Published var hoverSeen = false
-    private @Published var pointerOver = false
-    private @Published var clickFocus = ClickFocus()
-    private @Published var focusTimer: Timer?
+    @Published private var hoverSeen = false
+    @Published private var pointerOver = false
+    @Published private var clickFocus = ClickFocus()
+    @Published private var focusTimer: Timer?
     private weak var observedWindow: UIWindow?
-    private @Published var refreshing = false
-    private @Published var refreshAgain = false
+    @Published private var refreshing = false
+    @Published private var refreshAgain = false
 
     // MARK: held state (main thread)
 
-    private @Published var keys = FocusGate<Int32>()
-    private @Published var keysPosted = HeldEdges<Int32>()
+    @Published private var keys = FocusGate<Int32>()
+    @Published private var keysPosted = HeldEdges<Int32>()
     /// Buttons whose press went to the program and are still down.
-    private @Published var gameButtons: Set<MouseButton> = []
-    private @Published var buttonsPosted = HeldEdges<MouseButton>()
+    @Published private var gameButtons: Set<MouseButton> = []
+    @Published private var buttonsPosted = HeldEdges<MouseButton>()
     /// iPhone: presses waiting for the tap that says where they belong.
-    private @Published var pendingButtons: [MouseButton: (at: CFTimeInterval, released: Bool)] = [:]
-    private @Published var gcButtonSeen = false
+    @Published private var pendingButtons: [MouseButton: (at: CFTimeInterval, released: Bool)] = [:]
+    @Published private var gcButtonSeen = false
 
     // MARK: cursor and lock state (main thread)
 
-    private @Published var cursorState = winios_direct_cursor_state()
-    private @Published var cursorHiddenSince: CFTimeInterval = 0
-    private @Published var lastReportAt: CFTimeInterval = 0
+    @Published private var cursorState = winios_direct_cursor_state()
+    @Published private var cursorHiddenSince: CFTimeInterval = 0
+    @Published private var lastReportAt: CFTimeInterval = 0
     /// The mouse (or the right-stick mouse) is being used; a finger on the game
     /// view clears it. The drawn cursor shows only while this is true.
-    private @Published var mouseInUse = false
-    private @Published var currentRoute: PointerRoute = .relative
+    @Published private var mouseInUse = false
+    @Published private var currentRoute: PointerRoute = .relative
     /// The last absolute position posted: the drawn cursor's position on the
     /// absolute route (the driver's report would trail it).
-    private @Published var lastAbsolute: (x: Int32, y: Int32)?
-    private @Published var lockedByUs = false
+    @Published private var lastAbsolute: (x: Int32, y: Int32)?
+    @Published private var lockedByUs = false
     /// The user released an automatic lock: leave it off until the program's
     /// cursor next changes visibility.
-    private @Published var autoLockSuppressed = false
+    @Published private var autoLockSuppressed = false
 
     // MARK: motion state (motionLock)
 
@@ -620,42 +620,42 @@ final class HardwareInput: ObservableObject {
     /// `winios_pointer` pushes into a mutex-guarded ring. Buttons hop to main.
     private let mouseQueue = DispatchQueue(label: "madeira.hwinput.mouse", qos: .userInteractive)
     private let motionLock = NSLock()
-    private @Published var carry = MotionCarry()
-    private @Published var wheel = WheelAccumulator()
+    @Published private var carry = MotionCarry()
+    @Published private var wheel = WheelAccumulator()
     /// `currentRoute`, for the mouse queue.
-    private @Published var route: PointerRoute = .relative
-    private @Published var mouseInUseMirror = false
+    @Published private var route: PointerRoute = .relative
+    @Published private var mouseInUseMirror = false
     /// A GCMouse delta inside this many seconds means the hand is on the mouse
     /// and a `.direct` touch is AssistiveTouch's, not a finger's.
     private static let mouseActiveWindow: CFTimeInterval = 2.0
-    private @Published var lastGCDeltaAt: CFTimeInterval = 0
-    private @Published var lastGCButtonAt: CFTimeInterval = 0
-    private @Published var gcDeltaLive = false
-    private @Published var rawSeq = 0
-    private @Published var tickDX = 0.0, tickDY = 0.0, tickWheel = 0
-    private @Published var tickerArmed = false
-    private @Published var desktopCursorSynced = false
+    @Published private var lastGCDeltaAt: CFTimeInterval = 0
+    @Published private var lastGCButtonAt: CFTimeInterval = 0
+    @Published private var gcDeltaLive = false
+    @Published private var rawSeq = 0
+    @Published private var tickDX = 0.0, tickDY = 0.0, tickWheel = 0
+    @Published private var tickerArmed = false
+    @Published private var desktopCursorSynced = false
     // Delivery statistics, reported every 10 s while diagnostics are on.
     private static let deliveryWindow: CFTimeInterval = 10.0
-    private @Published var devCount = 0
-    private @Published var devLastAt: CFTimeInterval = 0
-    private @Published var devGapSum = 0.0
-    private @Published var devGapMax = 0.0
-    private @Published var devWindowStart: CFTimeInterval = 0
+    @Published private var devCount = 0
+    @Published private var devLastAt: CFTimeInterval = 0
+    @Published private var devGapSum = 0.0
+    @Published private var devGapMax = 0.0
+    @Published private var devWindowStart: CFTimeInterval = 0
 
     // MARK: bookkeeping (main thread)
 
-    private @Published var started = false
+    @Published private var started = false
     /// GameController hands the same GCMouse back from `mice()`, `current` and
     /// the notifications; the identity set decides what is news.
-    private @Published var attachedMice = Set<ObjectIdentifier>()
-    private @Published var gcDeltaSeen = false
-    private @Published var uikitSeen = false
-    private @Published var touchClassLogged = 0
-    private @Published var phoneLockNoted = false
-    private @Published var hintArmed = false
-    private @Published var ticker: Timer?
-    private @Published var tickKeys = 0
+    @Published private var attachedMice = Set<ObjectIdentifier>()
+    @Published private var gcDeltaSeen = false
+    @Published private var uikitSeen = false
+    @Published private var touchClassLogged = 0
+    @Published private var phoneLockNoted = false
+    @Published private var hintArmed = false
+    @Published private var ticker: Timer?
+    @Published private var tickKeys = 0
 
     private static let moveFlag: UInt32 = 0x0001
     private static let absoluteFlag: UInt32 = 0x8000
@@ -1947,13 +1947,13 @@ final class PadStickMouse: ObservableObject {
     /// visibility).
     @Published private(set) var controllerConnected = false
 
-    private @Published var profile: GCExtendedGamepad?
-    private @Published var link: CADisplayLink?
-    private @Published var carry = MotionCarry()
-    private @Published var appActive = true
-    private @Published var wanted = false
-    private @Published var started = false
-    private @Published var toggleSink: AnyCancellable?
+    @Published private var profile: GCExtendedGamepad?
+    @Published private var link: CADisplayLink?
+    @Published private var carry = MotionCarry()
+    @Published private var appActive = true
+    @Published private var wanted = false
+    @Published private var started = false
+    @Published private var toggleSink: AnyCancellable?
 
     /// Idempotent; main thread. Nothing with MADEIRA_HWINPUT=0.
     func start() {

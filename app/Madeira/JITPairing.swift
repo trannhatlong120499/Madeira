@@ -66,12 +66,12 @@ import UserNotifications
         }
     }
 
-    private @Published var session: OpaquePointer?
-    private @Published var registration: DNSServiceRef?
-    private @Published var continued: AnyObject?            // BGContinuedProcessingTask (iOS 26+)
-    private @Published var registered: String?
-    private @Published var grace: UIBackgroundTaskIdentifier = .invalid
-    private @Published var deadline: Timer?
+    @Published private var session: OpaquePointer?
+    @Published private var registration: DNSServiceRef?
+    @Published private var continued: AnyObject?            // BGContinuedProcessingTask (iOS 26+)
+    @Published private var registered: String?
+    @Published private var grace: UIBackgroundTaskIdentifier = .invalid
+    @Published private var deadline: Timer?
 
     private init() {}
 

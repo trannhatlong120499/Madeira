@@ -180,7 +180,7 @@ final class JITCoordinator: ObservableObject {
     /// What the last loopback check found (nil: none ran). A JIT failure after it found no
     /// lockdownd is a LocalDevVPN problem whatever the helper's message says: a network
     /// that accepts any connection makes the helper's read end early ("early eof").
-    private @Published var loopbackAnswered: Bool?
+    @Published private var loopbackAnswered: Bool?
     @Published var showSetup = false
     @Published private(set) var busy = false
     @Published private(set) var status: String?
