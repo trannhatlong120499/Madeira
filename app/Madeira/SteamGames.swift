@@ -906,8 +906,11 @@ struct SteamGameSheet: View {
                         }
                     }
                 } else {
-                    ContentUnavailableView("Game unavailable", systemImage: "questionmark.square.dashed",
-                                           description: Text("Refresh your Steam library and try again."))
+                    VStack(spacing: 8) {
+                        Image(systemName: "questionmark.square.dashed").font(.largeTitle).foregroundColor(.secondary)
+                        Text("Game unavailable").font(.title2).bold()
+                        Text("Refresh your Steam library and try again.").foregroundColor(.secondary)
+                    }
                 }
             }
             .navigationTitle("Steam").navigationBarTitleDisplayMode(.inline)

@@ -1731,8 +1731,7 @@ struct LiquidMetalFill: View {
                 // Kept small, so the shader's float time stays precise.
                 let time = Float(context.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 3600))
                 Rectangle()
-                    .colorEffect(ShaderLibrary.liquidMetal(.float2(geometry.size), .float(reduceMotion ? 0 : time),
-                                                           .float(Float(displayScale)), .float(scheme == .light ? 1 : 0)))
+                    // iOS 17 effect removed for iOS 16 compatibility
             }
         }
         .allowsHitTesting(false)
@@ -2177,7 +2176,11 @@ struct LibraryView: View {
                                           part: steamFirst ? .notInstalled : .all, open: { selected = $0 })
                     }
                 } else if model.entries.filter({ $0.desktop != true && $0.steamAppID == nil }).isEmpty {
-                    ContentUnavailableView("Make yourself at home", systemImage: "gamecontroller", description: Text("Copy a game's folder into Madeira › wine › drive_c with the Files app, then tap + and choose its .exe."))
+                    VStack(spacing: 8) {
+                        Image(systemName: "gamecontroller").font(.largeTitle).foregroundColor(.secondary)
+                        Text("Make yourself at home").font(.title2).bold()
+                        Text("Copy a game's folder into Madeira › wine › drive_c with the Files app, then tap + and choose its .exe.").foregroundColor(.secondary).multilineTextAlignment(.center)
+                    }.padding()
                 } else {
                     cells(entries, width: viewport.size.width)
                 }
