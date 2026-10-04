@@ -632,7 +632,9 @@ final class HardwareInput: ObservableObject {
     @Published private var lastGCButtonAt: CFTimeInterval = 0
     @Published private var gcDeltaLive = false
     @Published private var rawSeq = 0
-    @Published private var tickDX = 0.0, tickDY = 0.0, tickWheel = 0
+    @Published private var tickDX = 0.0
+    @Published private var tickDY = 0.0
+    @Published private var tickWheel = 0
     @Published private var tickerArmed = false
     @Published private var desktopCursorSynced = false
     // Delivery statistics, reported every 10 s while diagnostics are on.

@@ -130,7 +130,7 @@ final class SteamSignInModel: ObservableObject {
     private let qr = SteamQRAuth()
     @Published private var signInTask: Task<Void, Never>?
 
-    @Published var signedIn: Bool { accountName != nil }
+    var signedIn: Bool { accountName != nil }
 
     init() { refresh() }
 

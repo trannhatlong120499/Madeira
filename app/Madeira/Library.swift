@@ -431,7 +431,7 @@ final class LibraryModel: ObservableObject {
     @Published var menuButtonRect = CGRect.zero
     @Published var performanceRect = CGRect.zero
     /// The in-game menu and the starting screen take every touch.
-    @Published var blocksGameplayTouch: Bool { current != nil && (menu || launching) }
+    var blocksGameplayTouch: Bool { current != nil && (menu || launching) }
     @Published private var timer: Timer?
     @Published private var sawProcess = false
     // Why a session ended by itself (not Quit): the program the app launched
@@ -1060,7 +1060,7 @@ struct LibraryTitleText: View {
             Image(systemName: jit ? "bolt.fill" : "bolt")
                 .font(.system(size: LibraryHeaderAlignment.titleFont().pointSize * 0.53, weight: .thin))
                 .foregroundStyle(jit ? Color.accentColor : Color.primary)
-                .contentTransition(.symbolEffect(.replace))
+                
                 .alignmentGuide(.firstTextBaseline) { d in d.height / 2 + LibraryHeaderAlignment.titleFont().capHeight / 2 }
                 .accessibilityLabel(jit ? "JIT enabled" : "JIT not enabled")
         }
@@ -1252,7 +1252,10 @@ struct LibraryNavSearch: UIViewControllerRepresentable {
             let layer = bar.layer
             let now = layer.convertTime(CACurrentMediaTime(), from: nil)
             let squeezed = 0.985, inTime = 0.12
-            let back = CASpringAnimation(perceptualDuration: 0.5, bounce: 0.5)
+            let back = CASpringAnimation()
+            back.damping = 15
+            back.mass = 1
+            back.stiffness = 150
             back.keyPath = "transform.scale"
             back.fromValue = squeezed
             back.toValue = 1
@@ -1573,7 +1576,7 @@ struct AmbientGlow: View {
             .hueRotation(.degrees(f.hue))
             // In the dark the light adds to the page (plusLighter): a very bright artwork's
             // light is brought down at the top (AmbientGlow.metal) so it does not glare.
-            .colorEffect(ShaderLibrary.ambientKnee(.float(dark ? 0.3 : 0)))
+            
             .mask { AmbientMovie.mask(f.light) }
             .mask {
                 let turn = reduceMotion ? 0 : 1.2 * sin(t * 0.12 + Double(seed % 97))
@@ -2196,7 +2199,9 @@ struct LibraryView: View {
             }
             else if ["left", "right", "up", "down"].contains(command) {
                 let delta = command == "left" || command == "up" ? -1 : 1
-                withAnimation(UIAccessibility.isReduceMotionEnabled ? nil : .easeOut(duration: 0.18)) { focused = ids[(index + delta + ids.count) % ids.count] }
+                let animation: Animation? = UIAccessibility.isReduceMotionEnabled ? nil : .easeOut(duration: 0.18)
+                let newIndex = (index + delta + ids.count) % ids.count
+                withAnimation(animation) { focused = ids[newIndex] }
             }
         }
         .sheet(isPresented: $browser) {
@@ -2217,23 +2222,23 @@ struct LibraryView: View {
                 }
             })
         }
-        .onChange(of: model.current) { _, current in if current != nil { selected = nil } }
-        .onChange(of: model.error) { _, error in if error != nil { selected = nil } }
-        .onChange(of: model.restartNotice) { _, notice in if notice != nil { selected = nil } }
-        .onChange(of: model.jitNotice) { _, notice in if notice != nil { selected = nil } }
-        .onChange(of: model.cloudNotice) { _, notice in if notice != nil { selected = nil } }
-        .onChange(of: jit.showSetup) { _, show in if show { selected = nil } }
-        .onChange(of: model.showDetail) { _, id in
+        .onChange(of: model.current) { current in if current != nil { selected = nil } }
+        .onChange(of: model.error) { error in if error != nil { selected = nil } }
+        .onChange(of: model.restartNotice) { notice in if notice != nil { selected = nil } }
+        .onChange(of: model.jitNotice) { notice in if notice != nil { selected = nil } }
+        .onChange(of: model.cloudNotice) { notice in if notice != nil { selected = nil } }
+        .onChange(of: jit.showSetup) { show in if show { selected = nil } }
+        .onChange(of: model.showDetail) { id in
             guard let id else { return }
             model.showDetail = nil
             selected = model.entries.first { $0.id == id }
         }
-        .onChange(of: scenePhase) { _, phase in if phase == .active { model.refreshFlag() } }
+        .onChange(of: scenePhase) { phase in if phase == .active { model.refreshFlag() } }
         .onAppear {
             if focused == nil { focused = LibraryEntry.desktopID }
             GlassSkin.shared.start()   // liquid metal on the navigation bar's glass pills
         }
-        .onChange(of: focused) { _, id in
+        .onChange(of: focused) { id in
             if let id { withAnimation(UIAccessibility.isReduceMotionEnabled ? nil : .easeInOut(duration: 0.2)) { reader.scrollTo(id, anchor: .center) } }
         }
         }
@@ -3059,7 +3064,7 @@ struct RuntimeMemorySyncSettings: View {
                 if changed { Text("Restart Madeira (close it from the app switcher) for these changes to apply.").foregroundStyle(.orange) }
             }
         }
-        .onChange(of: refresh) { _, _ in
+        .onChange(of: refresh) { _ in
             poolMB = Self.intKey("pool"); vramMB = Self.intKey("vram-mb"); swapMB = Self.intKey("swap-mb")
             coverage = Self.currentCoverage(); engine = SyncEngine.current
             eco = MadeiraConfig.bool("eco", default: false)
@@ -3142,7 +3147,7 @@ struct LibraryFloatingItem: View {
         .frame(maxWidth: isMenu ? 48 : max(48, min(390, viewport.width - insets.leading - insets.trailing - 16)))
         .fixedSize(horizontal: false, vertical: true)
         .background(GeometryReader { proxy in
-            Color.clear.onAppear { measured = proxy.size }.onChange(of: proxy.size) { _, size in measured = size }
+            Color.clear.onAppear { measured = proxy.size }.onChange(of: proxy.size) { size in measured = size }
         })
         .contentShape(Rectangle())
         .highPriorityGesture(DragGesture(minimumDistance: 6, coordinateSpace: .global).updating($drag) { value, state, transaction in
@@ -3154,7 +3159,7 @@ struct LibraryFloatingItem: View {
             }
         })
         .position(center)
-        .onAppear { record(rect) }.onChange(of: rect) { _, value in record(value) }
+        .onAppear { record(rect) }.onChange(of: rect) { value in record(value) }
         .onDisappear { record(.zero) }
         .task(id: touched) {
             guard isMenu else { return }
@@ -3227,7 +3232,7 @@ struct LibraryHUD: View {
             .preferredColorScheme(.dark)
         }.ignoresSafeArea()
         .onAppear { model.saveCurrentProfile() }
-        .onChange(of: model.menu) { _, open in
+        .onChange(of: model.menu) { open in
             LibraryController.shared.configure(enabled: model.enabled, ownsInput: open)
             if !open { bindsPage = false }
             if !open { model.saveCurrentProfile() }
@@ -3477,7 +3482,7 @@ struct LibraryLiveLogs: View {
                     }
                 }
                 .frame(maxWidth: .infinity, minHeight: max(0, geo.size.height - 16), alignment: .topLeading)
-            }.defaultScrollAnchor(.bottom).padding(8)
+            }.padding(8)
         }.background(.black.opacity(0.65), in: RoundedRectangle(cornerRadius: 10)).foregroundStyle(.white)
             .accessibilityLabel("Live diagnostic log")
     }

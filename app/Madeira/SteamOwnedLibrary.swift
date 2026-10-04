@@ -223,7 +223,7 @@ final class SteamOwnedLibrary: ObservableObject {
     }
     @Published private var timer: Timer?
 
-    @Published var hasActiveDownload: Bool { downloads.values.contains { $0.state == .active || $0.state == .queued } }
+    var hasActiveDownload: Bool { downloads.values.contains { $0.state == .active || $0.state == .queued } }
     func game(_ appID: Int) -> SteamOwnedGame? { owned.first { $0.id == appID } }
 
     // MARK: Files
